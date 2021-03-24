@@ -4,9 +4,11 @@ package com.lambdaschool.shoppingcart;
 import com.github.javafaker.Faker;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import com.lambdaschool.shoppingcart.models.Role;
-import com.lambdaschool.shoppingcart.models.User;
-import com.lambdaschool.shoppingcart.models.UserRoles;
+import com.lambdaschool.shoppingcart.models.*;
+import com.lambdaschool.shoppingcart.repository.CartItemRepository;
+import com.lambdaschool.shoppingcart.repository.ProductRepository;
+import com.lambdaschool.shoppingcart.services.CartItemService;
+import com.lambdaschool.shoppingcart.services.ProductService;
 import com.lambdaschool.shoppingcart.services.RoleService;
 import com.lambdaschool.shoppingcart.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,7 @@ import java.util.Locale;
 @Transactional
 @Component
 public class SeedData
-        implements CommandLineRunner
-{
+        implements CommandLineRunner {
    /**
     * Connects the Role Service to this process
     */
@@ -38,6 +39,15 @@ public class SeedData
     */
    @Autowired
    UserService userService;
+
+   @Autowired
+   CartItemRepository cartItemRepository;
+
+   @Autowired
+   ProductRepository productRepository;
+
+   @Autowired
+   ProductService productService;
 
    /**
     * Generates test, seed data for our application
@@ -51,8 +61,7 @@ public class SeedData
    @Transactional
    @Override
    public void run(String[] args) throws
-           Exception
-   {
+           Exception {
       userService.deleteAll();
       roleService.deleteAll();
       Role r1 = new Role("ADMIN");
@@ -66,7 +75,7 @@ public class SeedData
       // admin, data, user
       User u1 = new User("admin",
               "password",
-              "admin@lambdaschool.local","");
+              "admin@lambdaschool.local", "");
       u1.getRoles()
               .add(new UserRoles(u1,
                       r1));
@@ -82,7 +91,7 @@ public class SeedData
       // data, user
       User u2 = new User("cinnamon",
               "LambdaLlama",
-              "cinnamon@lambdaschool.local","");
+              "cinnamon@lambdaschool.local", "");
       u2.getRoles()
               .add(new UserRoles(u2,
                       r2));
@@ -94,7 +103,7 @@ public class SeedData
       // user
       User u3 = new User("barnbarn",
               "LambdaLlama",
-              "barnbarn@lambdaschool.local","");
+              "barnbarn@lambdaschool.local", "");
       u3.getRoles()
               .add(new UserRoles(u3,
                       r2));
@@ -102,12 +111,28 @@ public class SeedData
 
       User u4 = new User("puttat",
               "LambdaLlama",
-              "puttat@school.lambda","");
+              "puttat@school.lambda", "");
       u4.getRoles()
               .add(new UserRoles(u4,
                       r2));
       userService.save(u4);
 
+
+      var p1 = new Product(8, "PEN", "MAKES WORDS", 2.50, "");
+      var p2 = new Product(9, "PENCIL", "DOES MATH", 1.50, "");
+      var p3 = new Product(10, "COFFEE", "EVERYONE NEEDS COFFEE", 4.00, "");
+      productRepository.save(p1);
+      productRepository.save(p2);
+      productRepository.save(p3);
+
+
+
+
+      cartItemRepository.deleteAll();
+      cartItemRepository.save(new CartItem(userService.findByName("cinnamon"), p2, 3, ""));
+      cartItemRepository.save(new CartItem(userService.findByName("cinnamon"), p3, 2, ""));
+      cartItemRepository.save(new CartItem(userService.findByName("barnbarn"), p3, 1, ""));
+      cartItemRepository.save(new CartItem(userService.findByName("puttat"), p3, 17, ""));
 
 
    }

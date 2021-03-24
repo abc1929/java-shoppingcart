@@ -41,6 +41,13 @@ public class Product
 
     }
 
+    public Product(long productid, String name, String description, double price, String comments) {
+        this.productid = productid;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
+
     public long getProductid()
     {
         return productid;
